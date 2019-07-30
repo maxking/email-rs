@@ -56,7 +56,9 @@ impl Email {
             last = i;
             if x == b'\n' {
                 if bytes[i+1] == b' ' {
-                    header_line.push(x as char);
+                    // If the next line starts with a whitespace, we continue
+                    // parsing as a part of this same header.
+                    continue;
                 } else {
                     break;
                 }
