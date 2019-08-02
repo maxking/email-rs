@@ -3,5 +3,18 @@ name = "email-rs"
 version = "0.1.0"
 authors = ["Abhilash Raj <raj.abhilash1@gmail.com>"]
 edition = "2018"
+description = "Email parsing library"
+homepage = "https://github.com/maxking/email-rs"
+repository = "https://github.com/maxking/email-rs"
+readme = "README.md"
+keywords = ["email", "parser"]
+categories = ["email", "parsing"]
+license = "APL 2.0"
+license-file = "LICENSE"
+
+[badges]
+travis-ci = { repository = "maxking/email-rs", branch = "master" }
+maintenance = { status = "actively-developed" }
+
 
 [dependencies]
