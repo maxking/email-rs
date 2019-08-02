@@ -2,7 +2,7 @@ email-rs
 ==========
 
 Rust library to parse and generate emails. For starters, this will mostly
-conform to RFC 2822. Once we are successfully there, I will try to move on to
+conform to RFC 5322. Once we are successfully there, I will try to move on to
 implement other MIME formats.
 
 State
