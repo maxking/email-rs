@@ -9,7 +9,7 @@ repository = "https://github.com/maxking/email-rs"
 readme = "README.md"
 keywords = ["email", "parser"]
 categories = ["email", "parsing"]
-license = "APL 2.0"
+license = "Apache-2.0"
 license-file = "LICENSE"
 
 [badges]
