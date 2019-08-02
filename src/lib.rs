@@ -127,7 +127,7 @@ This is the body of the email".to_string();
     assert_eq!(email.headers.get("To"), Some(&"Someone".to_string()));
     assert_eq!(email.headers.get("From"), Some(&"maxking".to_string()));
     assert_eq!(email.headers.get("Subject"),
-               Some(&"This is a multiline subject\n which goes on for a while because I chose\n to fold it.".to_string()));
+               Some(&"This is a multiline subject which goes on for a while because I chose to fold it.".to_string()));
 
 
 }
@@ -153,7 +153,7 @@ Subject: This is a complex header which goes to
         assert_eq!(rest.is_some(), true);
         let (header, rest) = Email::get_one_header(rest.unwrap());
         assert_eq!(header, Some("Subject: This is a complex \
-                                 header which goes to\n 2nd line identified by whitespace at \
-                                 the\n start of each next line of header.".to_string()));
+                                 header which goes to 2nd line identified by whitespace at \
+                                 the start of each next line of header.".to_string()));
         assert_eq!(rest, None);
     }
