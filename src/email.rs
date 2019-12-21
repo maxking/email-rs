@@ -1,11 +1,11 @@
+use crate::header_value_parser::{create_header, EmailHeader};
 use std::collections::HashMap;
-
 /// Email represents an Email object and contains all the properties and data
 /// related to an email
 #[derive(Debug)]
 pub struct Email {
     /// All the Headers for top level Email.
-    pub headers: HashMap<String, String>,
+    pub headers: HashMap<String, EmailHeader>,
 
     /// body of the email is going to be stored as a string for now since we are
     /// going to parse only simple emails.
@@ -15,7 +15,6 @@ pub struct Email {
     pub children: Vec<Email>,
 }
 
-
 /// For simplicity Email's body is now just going to be string.
 type EmailBody = String;
 
@@ -24,26 +23,39 @@ impl Email {
     pub fn from_str(s: String) -> Email {
         let mut allheaders = HashMap::new();
 
-        let val: Vec<&str> = s.rsplitn(2, "\n\n").collect();
-        let mut headers = Some(val[1]);
-
+        let val: Vec<&str> = s.split("\n\n").collect();
+        println!("{:?}", val);
+        let mut headers = Some(val[0]);
 
         while let Some(_) = headers {
             match Email::get_one_header(headers.unwrap()) {
                 (Some(headerval), rest) => {
                     let key_val: Vec<&str> = headerval.rsplitn(2, ':').collect();
-                    allheaders.insert(String::from(key_val[1]),
-                                      String::from(key_val[0].trim_start()));
+                    allheaders.insert(
+                        String::from(key_val[1].to_lowercase()),
+                        create_header(key_val[1], key_val[0].trim_start()),
+                    );
                     headers = rest;
-                },
+                }
                 _ => break,
             }
         }
 
-        Email{
+        if let Some(EmailHeader::ContentType {
+            maintype,
+            subtype,
+            value,
+        }) = allheaders.get("content-type")
+        {
+            if maintype == "multipart" {
+                println!("Found a multipart email.")
+            }
+        }
+
+        Email {
             headers: allheaders,
-            body: val[0].to_string(),
-            children: vec!()
+            body: val[1].to_string(),
+            children: vec![],
         }
     }
 
@@ -56,7 +68,7 @@ impl Email {
         for (i, &x) in bytes.iter().enumerate() {
             last = i;
             if x == b'\n' {
-                if bytes[i+1] == b' ' {
+                if bytes[i + 1] == b' ' {
                     // If the next line starts with a whitespace, we continue
                     // parsing as a part of this same header.
                     continue;
@@ -68,8 +80,8 @@ impl Email {
             }
         }
 
-        let mut rest = Some(&_s[last+1..]);
-        if last+1 == _s.len() {
+        let mut rest = Some(&_s[last + 1..]);
+        if last + 1 == _s.len() {
             rest = None;
         }
         (Some(header_line), rest)
@@ -91,15 +103,18 @@ impl Email {
     }
 }
 
-
-
 #[test]
 fn test_get_one_simple_header() {
     let headers = "From: Someone
 To: Person
 Date: Today";
-    assert_eq!(Email::get_one_header(headers),
-               (Some("From: Someone".to_string()), Some("To: Person\nDate: Today")))
+    assert_eq!(
+        Email::get_one_header(headers),
+        (
+            Some("From: Someone".to_string()),
+            Some("To: Person\nDate: Today")
+        )
+    )
 }
 
 #[test]
@@ -112,8 +127,14 @@ Subject: This is a complex header which goes to
     assert_eq!(header, Some("From: acomplexheader".to_string()));
     assert_eq!(rest.is_some(), true);
     let (header, rest) = Email::get_one_header(rest.unwrap());
-    assert_eq!(header, Some("Subject: This is a complex \
-                             header which goes to 2nd line identified by whitespace at \
-                             the start of each next line of header.".to_string()));
+    assert_eq!(
+        header,
+        Some(
+            "Subject: This is a complex \
+             header which goes to 2nd line identified by whitespace at \
+             the start of each next line of header."
+                .to_string()
+        )
+    );
     assert_eq!(rest, None);
 }
