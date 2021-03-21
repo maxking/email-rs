@@ -1,6 +1,6 @@
 [package]
 name = "email-rs"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Abhilash Raj <raj.abhilash1@gmail.com>"]
 edition = "2018"
 description = "Email parsing library"
