@@ -1,4 +1,3 @@
-
 // Parser for email header values.
 //
 // This returned structured parsing of the Email headers.
