@@ -11,10 +11,9 @@ pub fn check_defects(serialized: &str) {
         .arg("testfile")
         .output()
         .expect("Failed to run checkdefects.py");
-    assert_eq!(
-        cmd.status.success(),
-        true,
-        "{:?}",
-        str::from_utf8(&cmd.stderr).unwrap()
-    );
+
+    if !cmd.status.success() {
+        println!("{}", str::from_utf8(&cmd.stderr).unwrap());
+        panic!("Test failed.")
+    }
 }

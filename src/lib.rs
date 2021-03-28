@@ -18,6 +18,7 @@
 //!
 //! ```rust
 //! use email_rs::Email;
+//! use email_rs::header_value_parser::EmailHeader;
 //!
 //! let mut mail = Email::new();
 //! mail.from("maxking@example.com".to_string())
@@ -34,7 +35,7 @@
 //! ```
 //! The above will print:
 //!
-//! ```
+//! <pre>
 //! Subject: Welcome to the new library.
 //! x-mailfrom: maxking@example.com
 //! Content-Type: text/plain;
@@ -42,8 +43,9 @@
 //! From: maxking@example.com
 //!
 //! Hello World
-//! ```
+//! </pre>
 pub mod email;
+
 pub mod header_value_parser;
 
 mod tests;
