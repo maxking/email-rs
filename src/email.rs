@@ -189,6 +189,19 @@ fn test_create_simple_email() {
 }
 
 #[test]
+#[ignore]
+fn test_email_with_long_lines() {
+    let mut mail = Email::new();
+    mail.from("someone@example.com".to_string())
+        .to("aperson@example.com".to_string())
+        .add_header("X-RandomHeader".to_string(),
+                    EmailHeader::Generic(String::from_utf8(vec![b'X'; 1000]).unwrap()))
+        .content(String::from_utf8(vec![b'H'; 1000]).unwrap());
+    helpers::check_defects(&mail.to_string());
+    println!("{}", mail.to_string())
+}
+
+#[test]
 fn test_get_one_simple_header() {
     let headers = "From: Someone
 To: Person
