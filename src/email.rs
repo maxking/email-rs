@@ -1,7 +1,10 @@
 use crate::header_value_parser::{create_header, EmailHeader};
+use crate::tests::helpers;
 use std::collections::HashMap;
+
+
 /// Email represents an Email object and contains all the properties and data
-/// related to an email
+/// related to an email.
 #[derive(Debug)]
 pub struct Email {
     /// All the Headers for top level Email.
@@ -11,8 +14,8 @@ pub struct Email {
     /// going to parse only simple emails.
     pub body: EmailBody,
 
-    /// Children are child Email objects in case of multipart emails.
-    pub children: Vec<Email>,
+    // Children are child Email objects in case of multipart emails.
+    // pub children: Vec<Email>,
 }
 
 /// For simplicity Email's body is now just going to be string.
@@ -55,7 +58,6 @@ impl Email {
         Email {
             headers: allheaders,
             body: val[1].to_string(),
-            children: vec![],
         }
     }
 
@@ -87,20 +89,87 @@ impl Email {
         (Some(header_line), rest)
     }
 
-    /// generate an Email from raw bytes.
-    fn from_bytes() -> Email {
-        unimplemented!();
-    }
-
-    /// generate an email from a file path.
-    fn from_file() -> Email {
-        unimplemented!();
-    }
-
     /// Create a new email.
-    fn new() -> Email {
-        unimplemented!();
+    pub fn new() -> Email {
+        Email{
+            body: String::from(""),
+            headers: HashMap::new(),
+        }
     }
+
+    /// Add a new header.
+    pub fn add_header(&mut self, key: String, value: EmailHeader) -> &mut Self {
+        self.headers.insert(key, value);
+        self
+    }
+
+    /// Set the To: header.
+    pub fn to(&mut self, value: String) -> &mut Self {
+        self.add_header(String::from("To"), EmailHeader::To(value))
+    }
+
+    /// Set the From: header.
+    pub fn from(&mut self, value: String) -> &mut Self {
+        self.add_header(String::from("From"), EmailHeader::From(value))
+    }
+
+    /// Add the Content-Type header.
+    pub fn content_type(&mut self, maintype: String, subtype: String, value: String) -> &mut Self {
+        self.add_header(String::from("Content-Type"), EmailHeader::ContentType{maintype, subtype, value})
+    }
+
+    /// Add the Subject.
+    pub fn subject(&mut self, value: String) -> &mut Self {
+        self.add_header(String::from("Subject"), EmailHeader::Subject(value))
+    }
+
+    /// Set the body of the Email.
+    pub fn content(&mut self, value: String) -> &mut Self {
+        self.body = value;
+        self
+    }
+}
+
+
+impl ToString for Email {
+    fn to_string(&self) -> String {
+        let mut serialized = String::new();
+        for header in self.headers.iter() {
+            let headerstr = match header {
+            (_, EmailHeader::To(value)) => format!("To: {}", value),
+            (_, EmailHeader::From(value)) => format!("From: {}", value),
+            (_, EmailHeader::Date(value)) => format!("Date: {}", value),
+            (_, EmailHeader::Subject(value)) => format!("Subject: {}", value),
+            (_, EmailHeader::MessageID(value)) => format!("Message-ID: {}", value),
+            (_, EmailHeader::ContentType{maintype, subtype, value}) => {
+                format!("Content-Type: {}/{}; {}", maintype, subtype, value)},
+            (_, EmailHeader::ContentTransferEncoding(value)) => {
+                format!("Content-Transfer-Encoding: {:?}", value)},
+            (key, EmailHeader::Generic(value)) => format!("{}: {}", key, value)
+        };
+            serialized.push_str(&headerstr);
+            serialized.push_str("\r\n")
+        }
+        serialized.push_str("\r\n");
+        serialized.push_str(&self.body);
+        serialized
+    }
+}
+
+
+#[test]
+fn test_create_simple_email() {
+    let mut newmail = Email::new();
+
+    newmail.from("maxking@example.com".to_string())
+        .to("testing@example.com".to_string())
+        .subject("Welcome to the new library.".to_string())
+        .content_type("text".to_string(), "plain".to_string(), "".to_string())
+        .content("Hello World".to_string())
+        .add_header("x-mailfrom".to_string(), EmailHeader::Generic("maxking@example.com".to_string()));
+    
+    helpers::check_defects(&newmail.to_string());
+    println!("{}", newmail.to_string());
 }
 
 #[test]

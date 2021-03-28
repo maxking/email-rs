@@ -1,3 +1,4 @@
+
 // Parser for email header values.
 //
 // This returned structured parsing of the Email headers.
@@ -35,7 +36,7 @@ pub enum EmailHeader {
 
     /// A GenericHeader represents all the headers we don't have special value
     /// parsers for. It includes both the key and value of the email header.
-    GenericHeader { key: String, value: String },
+    Generic(String),
 }
 
 /// Returns one of the EmailHeader based on the "key" type. The header's value
@@ -49,7 +50,7 @@ pub fn create_header(key: &str, value: &str) -> EmailHeader {
         "content-type" => parse_content_type(value),
         "content-transfer-encoding" => parse_cte(value),
         "message-id" => parse_message_id(value),
-        _ => parse_generic_header(key, value),
+        _ => parse_generic_header(value),
     }
 }
 
@@ -97,9 +98,6 @@ fn parse_message_id(value: &str) -> EmailHeader {
     EmailHeader::MessageID(value.to_string())
 }
 
-fn parse_generic_header(key: &str, value: &str) -> EmailHeader {
-    EmailHeader::GenericHeader {
-        key: key.to_string(),
-        value: value.to_string(),
-    }
+fn parse_generic_header(value: &str) -> EmailHeader {
+    EmailHeader::Generic(value.to_string())
 }

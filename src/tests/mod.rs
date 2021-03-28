@@ -1,6 +1,8 @@
 use super::email::Email;
 use super::header_value_parser::EmailHeader;
 
+pub mod helpers;
+
 #[cfg(test)]
 #[test]
 fn test_parse_simple_email() {
@@ -30,7 +32,7 @@ Hello World.
                 assert_eq!(value, "<messagecanthavespace@localhost.localdomain>")
             }
             (_, EmailHeader::Date(value)) => assert_eq!(value, "9th Oct 2019"),
-            (_, EmailHeader::GenericHeader { key, value }) => {
+            (key, EmailHeader::Generic(value)) => {
                 println!("Found unrecognized header {:?} with value {:?}", key, value)
             }
             _ => panic!("Unrecognized header type {:?}", header),
